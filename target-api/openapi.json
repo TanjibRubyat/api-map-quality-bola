@@ -1,0 +1,90 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Demo Target API",
+    "version": "1.0.0",
+    "description": "A deliberately vulnerable API used as a local test target. This is the COMPLETE, correct map. The experiment damages copies of this file."
+  },
+  "servers": [{ "url": "http://localhost:3000" }],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "summary": "Log in and receive a token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "token" } }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "summary": "Return the current user and the ids they own",
+        "responses": { "200": { "description": "ok" } }
+      }
+    },
+    "/api/orders/{id}": {
+      "get": {
+        "summary": "Get an order by id",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "ok" } }
+      }
+    },
+    "/api/invoices/{id}": {
+      "get": {
+        "summary": "Get an invoice by id",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "ok" } }
+      }
+    },
+    "/api/messages/{id}": {
+      "get": {
+        "summary": "Get a message by id",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "ok" } }
+      }
+    },
+    "/api/documents/{id}": {
+      "get": {
+        "summary": "Get a document by id",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "ok" } }
+      }
+    },
+    "/api/users/{id}/profile": {
+      "get": {
+        "summary": "Get a user profile by id",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "ok" } }
+      }
+    },
+    "/api/users/{id}/settings": {
+      "get": {
+        "summary": "Get a user settings record by id",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "ok" } }
+      }
+    }
+  }
+}

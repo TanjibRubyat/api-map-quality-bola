@@ -1,0 +1,12 @@
+{
+  "name": "target-api",
+  "version": "1.0.0",
+  "description": "Deliberately vulnerable demo API (BOLA) for MSc project. Local use only.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
