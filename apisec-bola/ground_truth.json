@@ -1,0 +1,29 @@
+{
+  "description": "Known truth about the target API. true = this endpoint has a BOLA flaw (no ownership check).",
+  "endpoints": {
+    "GET /api/orders/{id}": true,
+    "GET /api/invoices/{id}": false,
+    "GET /api/messages/{id}": true,
+    "GET /api/documents/{id}": false,
+    "GET /api/payments/{id}": true,
+    "GET /api/addresses/{id}": false,
+    "GET /api/tickets/{id}": true,
+    "GET /api/bookings/{id}": false,
+    "GET /api/reviews/{id}": true,
+    "GET /api/notifications/{id}": false,
+    "GET /api/carts/{id}": true,
+    "GET /api/wishlists/{id}": false,
+    "GET /api/subscriptions/{id}": true,
+    "GET /api/transactions/{id}": false,
+    "GET /api/reports/{id}": true,
+    "GET /api/files/{id}": false,
+    "GET /api/comments/{id}": true,
+    "GET /api/sessions/{id}": false,
+    "GET /api/apikeys/{id}": true,
+    "GET /api/contacts/{id}": false,
+    "GET /api/events/{id}": true,
+    "GET /api/tasks/{id}": false,
+    "GET /api/profiles/{id}": true,
+    "GET /api/settings/{id}": false
+  }
+}
