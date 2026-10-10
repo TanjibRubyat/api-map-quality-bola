@@ -67,11 +67,16 @@ def object_endpoints(spec):
 
 def victim_ids_for(path, victim):
     """Decide which of the victim's ids to try for a given endpoint."""
+    owns = victim.get("owns", {})
     # /api/users/{id}/... uses the user's own id, not an object id.
     if "/users/{id}" in path:
         return [victim["id"]]
-    # Otherwise try every object id the victim owns.
-    return list(victim.get("owns", {}).values())
+    # For /api/<resource>/{id}, use the victim's id for that resource if known.
+    parts = [p for p in path.split("/") if p and p != "{id}"]
+    if parts and parts[-1] in owns:
+        return [owns[parts[-1]]]
+    # Fallback: try every object id the victim owns.
+    return list(owns.values())
 
 
 def test_endpoint(base_url, path, attacker_token, victim):
