@@ -1,5 +1,6 @@
 {
   "description": "Known truth about the target API. true = this endpoint has a BOLA flaw (no ownership check).",
+  "id_mode": "seq",
   "endpoints": {
     "GET /api/orders/{id}": true,
     "GET /api/invoices/{id}": false,

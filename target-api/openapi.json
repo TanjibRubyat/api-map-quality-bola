@@ -2,21 +2,71 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Demo Target API",
-    "version": "2.0.0",
-    "description": "A deliberately vulnerable API used as a local test target. This is the COMPLETE, correct map. The experiment damages copies of it."
+    "version": "3.0.0",
+    "description": "A deliberately vulnerable API used as a local test target. This is the COMPLETE, correct (gold) map. The experiment degrades copies of it."
   },
   "servers": [
     {
       "url": "http://localhost:3000"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Bearer token from /api/login"
+      }
+    }
+  },
   "paths": {
     "/api/login": {
       "post": {
-        "summary": "Log in and receive a token",
+        "summary": "Log in and receive a bearer token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ]
+              },
+              "example": {
+                "username": "alice",
+                "password": "alice123"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "token"
+            "description": "A bearer token for the authenticated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "token": "token-alice"
+                }
+              }
+            }
           }
         }
       }
@@ -24,9 +74,37 @@
     "/api/me": {
       "get": {
         "summary": "Return the current user and the ids they own",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "The current user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "owns": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 1,
+                  "username": "alice",
+                  "owns": {}
+                }
+              }
+            }
           }
         }
       }
@@ -34,19 +112,51 @@
     "/api/orders/{id}": {
       "get": {
         "summary": "Get a orders record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the orders object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A orders object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob orders"
+                }
+              }
+            }
           }
         }
       }
@@ -54,19 +164,51 @@
     "/api/invoices/{id}": {
       "get": {
         "summary": "Get a invoices record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the invoices object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A invoices object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob invoices"
+                }
+              }
+            }
           }
         }
       }
@@ -74,19 +216,51 @@
     "/api/messages/{id}": {
       "get": {
         "summary": "Get a messages record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the messages object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A messages object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob messages"
+                }
+              }
+            }
           }
         }
       }
@@ -94,19 +268,51 @@
     "/api/documents/{id}": {
       "get": {
         "summary": "Get a documents record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the documents object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A documents object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob documents"
+                }
+              }
+            }
           }
         }
       }
@@ -114,19 +320,51 @@
     "/api/payments/{id}": {
       "get": {
         "summary": "Get a payments record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the payments object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A payments object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob payments"
+                }
+              }
+            }
           }
         }
       }
@@ -134,19 +372,51 @@
     "/api/addresses/{id}": {
       "get": {
         "summary": "Get a addresses record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the addresses object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A addresses object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob addresses"
+                }
+              }
+            }
           }
         }
       }
@@ -154,19 +424,51 @@
     "/api/tickets/{id}": {
       "get": {
         "summary": "Get a tickets record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the tickets object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A tickets object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob tickets"
+                }
+              }
+            }
           }
         }
       }
@@ -174,19 +476,51 @@
     "/api/bookings/{id}": {
       "get": {
         "summary": "Get a bookings record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the bookings object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A bookings object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob bookings"
+                }
+              }
+            }
           }
         }
       }
@@ -194,19 +528,51 @@
     "/api/reviews/{id}": {
       "get": {
         "summary": "Get a reviews record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the reviews object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A reviews object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob reviews"
+                }
+              }
+            }
           }
         }
       }
@@ -214,19 +580,51 @@
     "/api/notifications/{id}": {
       "get": {
         "summary": "Get a notifications record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the notifications object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A notifications object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob notifications"
+                }
+              }
+            }
           }
         }
       }
@@ -234,19 +632,51 @@
     "/api/carts/{id}": {
       "get": {
         "summary": "Get a carts record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the carts object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A carts object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob carts"
+                }
+              }
+            }
           }
         }
       }
@@ -254,19 +684,51 @@
     "/api/wishlists/{id}": {
       "get": {
         "summary": "Get a wishlists record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the wishlists object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A wishlists object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob wishlists"
+                }
+              }
+            }
           }
         }
       }
@@ -274,19 +736,51 @@
     "/api/subscriptions/{id}": {
       "get": {
         "summary": "Get a subscriptions record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the subscriptions object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A subscriptions object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob subscriptions"
+                }
+              }
+            }
           }
         }
       }
@@ -294,19 +788,51 @@
     "/api/transactions/{id}": {
       "get": {
         "summary": "Get a transactions record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the transactions object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A transactions object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob transactions"
+                }
+              }
+            }
           }
         }
       }
@@ -314,19 +840,51 @@
     "/api/reports/{id}": {
       "get": {
         "summary": "Get a reports record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the reports object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A reports object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob reports"
+                }
+              }
+            }
           }
         }
       }
@@ -334,19 +892,51 @@
     "/api/files/{id}": {
       "get": {
         "summary": "Get a files record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the files object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A files object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob files"
+                }
+              }
+            }
           }
         }
       }
@@ -354,19 +944,51 @@
     "/api/comments/{id}": {
       "get": {
         "summary": "Get a comments record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the comments object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A comments object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob comments"
+                }
+              }
+            }
           }
         }
       }
@@ -374,19 +996,51 @@
     "/api/sessions/{id}": {
       "get": {
         "summary": "Get a sessions record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the sessions object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A sessions object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob sessions"
+                }
+              }
+            }
           }
         }
       }
@@ -394,19 +1048,51 @@
     "/api/apikeys/{id}": {
       "get": {
         "summary": "Get a apikeys record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the apikeys object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A apikeys object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob apikeys"
+                }
+              }
+            }
           }
         }
       }
@@ -414,19 +1100,51 @@
     "/api/contacts/{id}": {
       "get": {
         "summary": "Get a contacts record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the contacts object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A contacts object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob contacts"
+                }
+              }
+            }
           }
         }
       }
@@ -434,19 +1152,51 @@
     "/api/events/{id}": {
       "get": {
         "summary": "Get a events record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the events object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A events object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob events"
+                }
+              }
+            }
           }
         }
       }
@@ -454,19 +1204,51 @@
     "/api/tasks/{id}": {
       "get": {
         "summary": "Get a tasks record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the tasks object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A tasks object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob tasks"
+                }
+              }
+            }
           }
         }
       }
@@ -474,19 +1256,51 @@
     "/api/profiles/{id}": {
       "get": {
         "summary": "Get a profiles record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the profiles object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A profiles object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob profiles"
+                }
+              }
+            }
           }
         }
       }
@@ -494,19 +1308,51 @@
     "/api/settings/{id}": {
       "get": {
         "summary": "Get a settings record by id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "The id of the settings object to fetch",
             "schema": {
-              "type": "integer"
-            }
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
           }
         ],
         "responses": {
           "200": {
-            "description": "ok"
+            "description": "A settings object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ownerId": {
+                      "type": "integer",
+                      "description": "id of the user who owns this object"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 2,
+                  "ownerId": 2,
+                  "data": "bob settings"
+                }
+              }
+            }
           }
         }
       }
