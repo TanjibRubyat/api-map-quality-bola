@@ -31,6 +31,7 @@ Usage:
 
 import argparse
 import json
+import os
 import re
 import sys
 
@@ -42,6 +43,13 @@ except ImportError:
 OWNER_FIELD = "ownerId"        # the field that identifies an object's owner
 GUESS_MAX = 10                 # upper bound when the map declares an integer id
 BLIND_GUESS_MAX = 5            # smaller budget when no type is declared at all
+
+# Extension (off by default, so the frozen results are unchanged). When the map
+# documents no owner field, the tester normally treats any 200 as a leak. With
+# OWNER_INFERENCE=1 it instead checks whether the reply contains its own user id
+# (known from /api/me) in any field other than the requested id. If it does, the
+# reply is the caller's own object and is not a leak.
+OWNER_INFERENCE = os.environ.get("OWNER_INFERENCE") == "1"
 
 
 def load_spec(path):
@@ -112,6 +120,19 @@ def _fill(path, param_name, value):
     if token in path:
         return path.replace(token, str(value))
     return re.sub(r"\{[^}]+\}", str(value), path, count=1)
+
+
+def _contains_own_id(response, own_id, requested_id):
+    """True if any top-level field of a JSON object reply equals the caller's own
+    user id. The field holding the requested id itself is skipped, so an object
+    whose id happens to equal the caller's user id is not mistaken for its own."""
+    try:
+        body = response.json()
+    except ValueError:
+        return False
+    if not isinstance(body, dict):
+        return False
+    return any(v == own_id and v != requested_id for v in body.values())
 
 
 def test_endpoint(base_url, path, op, attacker_token, own_id):
@@ -208,6 +229,12 @@ def test_endpoint(base_url, path, op, attacker_token, own_id):
                 return {"tested": True, "reported_vulnerable": True,
                         "reason": f"leak_confirmed{suffix}"}
             # 200 but it is the caller's own object -> not a leak.
+        elif OWNER_INFERENCE:
+            # No documented owner field: look for the caller's own id in the reply.
+            if _contains_own_id(r, own_id, cid):
+                continue  # the caller's own object -> not a leak
+            return {"tested": True, "reported_vulnerable": True,
+                    "reason": f"leak_inferred{suffix}"}
         else:
             # No way to confirm ownership -> any 200 is treated as a leak.
             return {"tested": True, "reported_vulnerable": True,

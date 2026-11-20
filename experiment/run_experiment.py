@@ -283,7 +283,12 @@ def main():
     # The raw per-trial data, before averaging. Keeping it means any later
     # analysis (trend tests, different intervals, re-plots) can be done without
     # re-running the whole experiment.
-    trials_out = os.path.join(os.path.dirname(args.out), "experiment_trials.csv")
+    # The per-trial file sits next to --out. Its name follows --out, so a run
+    # written to another file (an extension) never overwrites the frozen
+    # experiment_trials.csv.
+    base = os.path.basename(args.out)
+    tname = base.replace("results", "trials") if "results" in base else os.path.splitext(base)[0] + "_trials.csv"
+    trials_out = os.path.join(os.path.dirname(args.out), tname)
     tfields = ["id_mode", "safe_mode", "analysis", "dimension", "level", "fraction",
                "biased", "trial", "seed", "recall", "precision", "false_positives",
                "coverage"]
